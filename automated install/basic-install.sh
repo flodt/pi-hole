@@ -56,9 +56,12 @@ coltable=/opt/pihole/COL_TABLE
 webroot="/var/www/html"
 
 # We store several other directories and
-webInterfaceGitUrl="https://github.com/pi-hole/AdminLTE.git"
+# Find the latest version tag for FTL
+# Modified to always find v4.3.1, as that's the version we need.
+versionTagFTL="v4.3.1"
+webInterfaceGitUrl="https://github.com/flodt/AdminLTE.git"
 webInterfaceDir="${webroot}/admin"
-piholeGitUrl="https://github.com/pi-hole/pi-hole.git"
+piholeGitUrl="https://github.com/flodt/pi-hole.git"
 PI_HOLE_LOCAL_REPO="/etc/.pihole"
 # These are the names of pi-holes files, stored in an array
 PI_HOLE_FILES=(chronometer list piholeDebug piholeLogFlush setupLCD update version gravity uninstall webpage)
@@ -2161,7 +2164,8 @@ FTLinstall() {
     printf "  %b %s..." "${INFO}" "${str}"
 
     # Find the latest version tag for FTL
-    latesttag=$(curl -sI https://github.com/pi-hole/FTL/releases/latest | grep "Location" | awk -F '/' '{print $NF}')
+    # Hard-coded to tag set at the top of the script, no online check executed
+    latesttag="${versionTagFTL}"
     # Tags should always start with v, check for that.
     if [[ ! "${latesttag}" == v* ]]; then
         printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
@@ -2392,7 +2396,8 @@ FTLcheckUpdate() {
                 return 3
             fi
 
-            FTLlatesttag=$(grep 'Location' <<< "${FTLreleaseData}" | awk -F '/' '{print $NF}' | tr -d '\r\n')
+            # Again, hard-code version number to the one set at the top of the script
+            FTLlatesttag="${versionTagFTL}"
 
             if [[ "${FTLversion}" != "${FTLlatesttag}" ]]; then
                 return 0
@@ -2470,7 +2475,7 @@ main() {
         if is_command sudo ; then
             printf "%b  %b Sudo utility check\\n" "${OVER}"  "${TICK}"
             # Download the install script and run it with admin rights
-            exec curl -sSL https://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh | sudo bash "$@"
+            exec curl -sSL https://raw.githubusercontent.com/flodt/pi-hole/master/automated%20install/basic-install.sh | sudo bash "$@"
             exit $?
         # Otherwise,
         else
